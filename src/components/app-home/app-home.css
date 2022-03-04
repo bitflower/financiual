@@ -24,6 +24,10 @@ button:hover {
   transform: translateY(1px);
 }
 
+table {
+  font-size: 13px;
+}
+
 table thead th {
   text-align: left;
 }
