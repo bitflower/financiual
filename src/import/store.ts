@@ -1,13 +1,18 @@
 import { createStore } from '@stencil/store';
 
-const { state, onChange } = createStore({
-  clicks: 0,
-  seconds: 0,
-  squaredClicks: 0,
-});
+import { ImportStore } from './store-interface';
 
-onChange('clicks', value => {
-  state.squaredClicks = value ** 2;
-});
+const initialStore: ImportStore = {
+  results: null,
+};
+
+const {
+  state,
+  // , onChange
+} = createStore(initialStore);
+
+// onChange('clicks', value => {
+//   state.squaredClicks = value ** 2;
+// });
 
 export default state;

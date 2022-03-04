@@ -4,6 +4,7 @@ import { readCSV } from '../../import/import';
 import state from '../../import/store';
 
 const csvFilePath = 'data/Buchungen.csv';
+const selectedFields = ['Date', 'PayeePayerName', 'EntryText', 'Purpose', 'Category', 'Value'];
 
 @Component({
   tag: 'app-home',
@@ -12,9 +13,10 @@ const csvFilePath = 'data/Buchungen.csv';
 })
 export class AppHome {
   private importCsv = async () => {
-    let parsedData = await readCSV(csvFilePath);
-    console.log(`BF PARSED DATA`, parsedData.data);
-    console.log(`BF PARSED HEADERS`, parsedData.meta.fields.join(', '));
+    // let parsedData = await readCSV(csvFilePath);
+    state.results = await readCSV(csvFilePath);
+    console.log(`BF PARSED DATA`, state.results.data);
+    // console.log(`BF PARSED HEADERS`, parsedData.meta.fields.join(', '));
   };
 
   render() {
@@ -29,10 +31,27 @@ export class AppHome {
           <button>Profile page</button>
         </stencil-route-link> */}
         <button onClick={this.importCsv}>Import</button>
-        <button onClick={() => state.clicks++}>{state.clicks}</button>
-        <ul>
-          <li>Seconds: {state.seconds}</li>
-        </ul>
+        {/* <button onClick={() => state.clicks++}>{state.clicks}</button> */}
+        {/* <ul>{state.results && state.results.meta.fields.filter(f => selectedFields.includes(f)).map(field => <li>{field}</li>)}</ul> */}
+
+        <table>
+          <thead>
+            <tr>{state.results && state.results.meta.fields.filter(f => selectedFields.includes(f)).map(field => <th>{field}</th>)}</tr>
+          </thead>
+          <tbody>
+            {state.results &&
+              state.results.data.map(record => (
+                <tr>
+                  {state.results.meta.fields
+                    .filter(f => selectedFields.includes(f))
+                    .map(field => (
+                      <td>{record[field]}</td>
+                    ))}
+                </tr>
+              ))}
+            <tr></tr>
+          </tbody>
+        </table>
       </div>
     );
   }
