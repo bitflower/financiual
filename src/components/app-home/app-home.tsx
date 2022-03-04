@@ -12,7 +12,8 @@ const csvFilePath = 'data/Buchungen.csv';
 export class AppHome {
   private importCsv = async () => {
     let parsedData = await readCSV(csvFilePath);
-    console.log(`BF PARSED`, parsedData);
+    console.log(`BF PARSED DATA`, parsedData.data);
+    console.log(`BF PARSED HEADERS`, parsedData.meta.fields.join(', '));
   };
 
   render() {
@@ -23,9 +24,9 @@ export class AppHome {
           <a href="https://stenciljs.com">stenciljs.com</a> to get started.
         </p>
 
-        <stencil-route-link url="/profile/stencil">
+        {/* <stencil-route-link url="/profile/stencil">
           <button>Profile page</button>
-        </stencil-route-link>
+        </stencil-route-link> */}
         <button onClick={this.importCsv}>Import</button>
       </div>
     );
