@@ -21,6 +21,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@stencil/store": "^1.5.0",
     "papaparse": "^5.3.1"
   }
 }

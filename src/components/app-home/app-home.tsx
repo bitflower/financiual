@@ -1,6 +1,7 @@
 import { Component, h } from '@stencil/core';
 
 import { readCSV } from '../../import/import';
+import state from '../../import/store';
 
 const csvFilePath = 'data/Buchungen.csv';
 
@@ -28,6 +29,10 @@ export class AppHome {
           <button>Profile page</button>
         </stencil-route-link> */}
         <button onClick={this.importCsv}>Import</button>
+        <button onClick={() => state.clicks++}>{state.clicks}</button>
+        <ul>
+          <li>Seconds: {state.seconds}</li>
+        </ul>
       </div>
     );
   }
