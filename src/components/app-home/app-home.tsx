@@ -14,6 +14,7 @@ const selectedFields = ['Date', 'PayeePayerName', 'EntryText', 'Purpose', 'Categ
 export class AppHome {
   private importCsv = async () => {
     // let parsedData = await readCSV(csvFilePath);
+    state.results = null;
     state.results = await readCSV(csvFilePath);
     console.log(`BF PARSED DATA`, state.results.data);
     // console.log(`BF PARSED HEADERS`, parsedData.meta.fields.join(', '));
@@ -22,10 +23,10 @@ export class AppHome {
   render() {
     return (
       <div class="app-home">
-        <p>
+        {/* <p>
           Welcome to the Stencil App Starter. You can use this starter to build entire apps all with web components using Stencil! Check out our docs on{' '}
           <a href="https://stenciljs.com">stenciljs.com</a> to get started.
-        </p>
+        </p> */}
 
         {/* <stencil-route-link url="/profile/stencil">
           <button>Profile page</button>

@@ -10,7 +10,7 @@ export class AppRoot {
     return (
       <div>
         <header>
-          <h1>Stencil App Starter</h1>
+          <h1>bitflower finaciual</h1>
         </header>
 
         <main>
