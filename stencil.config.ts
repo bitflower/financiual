@@ -16,6 +16,10 @@ export const config: Config = {
         {
           src: 'data',
         },
+        {
+          src: '../node_modules/@shoelace-style/shoelace/dist/assets',
+          dest: 'assets/shoelace/assets',
+        },
       ],
     },
   ],

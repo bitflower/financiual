@@ -17,6 +17,10 @@ export class AppHome {
     state.results = null;
     state.results = await readCSV(csvFilePath);
   };
+  private clusterData = async () => {
+    // state.results = null;
+    // state.results = await readCSV(csvFilePath);
+  };
 
   render() {
     return (
@@ -25,7 +29,28 @@ export class AppHome {
           <button>Profile page</button>
         </stencil-route-link> */}
         <button onClick={this.importCsv}>Import</button>
+        <button onClick={this.clusterData}>Cluster</button>
         {/* <ul>{stageState.fields.filter(f => selectedFields.includes(f)).map(field => <li>{field}</li>)}</ul> */}
+
+        <sl-tab-group>
+          <sl-tab slot="nav" panel="general">
+            General
+          </sl-tab>
+          <sl-tab slot="nav" panel="custom">
+            Custom
+          </sl-tab>
+          <sl-tab slot="nav" panel="advanced">
+            Advanced
+          </sl-tab>
+          <sl-tab slot="nav" panel="disabled" disabled>
+            Disabled
+          </sl-tab>
+
+          <sl-tab-panel name="general">This is the general tab panel.</sl-tab-panel>
+          <sl-tab-panel name="custom">This is the custom tab panel.</sl-tab-panel>
+          <sl-tab-panel name="advanced">This is the advanced tab panel.</sl-tab-panel>
+          <sl-tab-panel name="disabled">This is a disabled tab panel.</sl-tab-panel>
+        </sl-tab-group>
 
         <table>
           <thead>
