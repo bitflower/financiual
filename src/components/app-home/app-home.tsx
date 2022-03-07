@@ -1,4 +1,4 @@
-import { Component, h } from '@stencil/core';
+import { Component, Fragment, h } from '@stencil/core';
 
 import { readCSV } from '../../import/import';
 import importState from '../../import/store';
@@ -17,16 +17,23 @@ const valueProp = 'Value';
   shadow: true,
 })
 export class AppHome {
+  private sliderRef: HTMLInputElement;
+
   private importCsv = async () => {
     importState.results = null;
     importState.results = await readCSV(csvFilePath);
   };
+  private cluster;
   private clusterData = async () => {
-    const cluster = cluster2(stageState.data, sortProp);
+    this.cluster = cluster2(stageState.data, sortProp);
     // const cluster = cluster2(stageState.data.map(i => i[sortProp]));
     // console.log(`BF CLUSTER`, cluster.groups(2));
 
-    groupsStore.data = cluster.similarGroups(0.5);
+    this.buildGroups(0.5);
+  };
+
+  private buildGroups = (ratio: number) => {
+    groupsStore.data = this.cluster.similarGroups(ratio);
     console.log(`BF CLUSTERS`, groupsStore.data);
 
     // Cumulate data
@@ -50,6 +57,11 @@ export class AppHome {
     });
     console.log(`BF CLUSTER GROUPS`, groups);
     groupsStore.groups = groups;
+  };
+
+  private onSliderInput = (e: Event) => {
+    console.log(`BF SLIDER`, { e, val: this.sliderRef.value });
+    this.buildGroups(parseInt(this.sliderRef.value) / 100);
   };
 
   render() {
@@ -103,23 +115,28 @@ export class AppHome {
             {groupsStore.groups.length === 0 ? (
               <span>Keine Gruppen vorhanden.</span>
             ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Gruppe</th>
-                    <th>Betrag</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {groupsStore.groups.map(group => (
+              <Fragment>
+                <div class="slidecontainer">
+                  <input ref={el => (this.sliderRef = el)} type="range" min="1" max="100" value="50" class="slider" id="myRange" onChange={this.onSliderInput} />
+                </div>
+                <table>
+                  <thead>
                     <tr>
-                      <td>{group.name.substring(0, 63)}</td>
-                      <td>{group.value}</td>
+                      <th>Gruppe</th>
+                      <th>Betrag</th>
                     </tr>
-                  ))}
-                  <tr></tr>
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {groupsStore.groups.map(group => (
+                      <tr>
+                        <td>{group.name.substring(0, 63)}</td>
+                        <td>{group.value}</td>
+                      </tr>
+                    ))}
+                    <tr></tr>
+                  </tbody>
+                </table>
+              </Fragment>
             )}
           </sl-tab-panel>
         </sl-tab-group>
