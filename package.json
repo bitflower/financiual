@@ -15,6 +15,7 @@
     "@stencil/router": "^1.0.1",
     "@types/jest": "^27.0.3",
     "@types/papaparse": "^5.3.2",
+    "@types/string-similarity": "^4.0.0",
     "jest": "^27.4.5",
     "jest-cli": "^27.4.5",
     "puppeteer": "^10.0.0"
@@ -22,6 +23,8 @@
   "license": "MIT",
   "dependencies": {
     "@stencil/store": "^1.5.0",
-    "papaparse": "^5.3.1"
+    "papaparse": "^5.3.1",
+    "set-clustering": "^1.1.0",
+    "string-similarity": "^4.0.4"
   }
 }
