@@ -28,53 +28,49 @@ export class AppHome {
         {/* <stencil-route-link url="/profile/stencil">
           <button>Profile page</button>
         </stencil-route-link> */}
-        <button onClick={this.importCsv}>Import</button>
-        <button onClick={this.clusterData}>Cluster</button>
+        <button onClick={this.importCsv}>Importieren</button>
+        <button onClick={this.clusterData}>Gruppieren</button>
         {/* <ul>{stageState.fields.filter(f => selectedFields.includes(f)).map(field => <li>{field}</li>)}</ul> */}
 
         <sl-tab-group>
-          <sl-tab slot="nav" panel="general">
-            General
+          <sl-tab slot="nav" panel="import">
+            Rohdaten
           </sl-tab>
-          <sl-tab slot="nav" panel="custom">
-            Custom
-          </sl-tab>
-          <sl-tab slot="nav" panel="advanced">
-            Advanced
-          </sl-tab>
-          <sl-tab slot="nav" panel="disabled" disabled>
-            Disabled
+          <sl-tab slot="nav" panel="groups">
+            Gruppen
           </sl-tab>
 
-          <sl-tab-panel name="general">This is the general tab panel.</sl-tab-panel>
-          <sl-tab-panel name="custom">This is the custom tab panel.</sl-tab-panel>
-          <sl-tab-panel name="advanced">This is the advanced tab panel.</sl-tab-panel>
-          <sl-tab-panel name="disabled">This is a disabled tab panel.</sl-tab-panel>
-        </sl-tab-group>
-
-        <table>
-          <thead>
-            <tr>
-              {stageState.fields
-                .filter(f => selectedFields.includes(f))
-                .map(field => (
-                  <th>{field}</th>
-                ))}
-            </tr>
-          </thead>
-          <tbody>
-            {stageState.data.map(record => (
-              <tr>
-                {stageState.fields
-                  .filter(f => selectedFields.includes(f))
-                  .map(field => (
-                    <td>{record[field]}</td>
+          <sl-tab-panel name="import">
+            {stageState.data.length === 0 ? (
+              <span>Keine Daten importiert.</span>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    {stageState.fields
+                      .filter(f => selectedFields.includes(f))
+                      .map(field => (
+                        <th>{field}</th>
+                      ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {stageState.data.map(record => (
+                    <tr>
+                      {stageState.fields
+                        .filter(f => selectedFields.includes(f))
+                        .map(field => (
+                          <td>{record[field]}</td>
+                        ))}
+                    </tr>
                   ))}
-              </tr>
-            ))}
-            <tr></tr>
-          </tbody>
-        </table>
+                  <tr></tr>
+                </tbody>
+              </table>
+            )}
+          </sl-tab-panel>
+          <sl-tab-panel name="groups">Hier werden die Gruppen dargestellt.</sl-tab-panel>
+        </sl-tab-group>
       </div>
     );
   }
