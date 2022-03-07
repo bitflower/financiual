@@ -1,11 +1,15 @@
 import { Component, h } from '@stencil/core';
 
 import { readCSV } from '../../import/import';
-import state from '../../import/store';
+import importState from '../../import/store';
 import stageState from '../../stage/store';
+import groupsStore from '../../groups/store';
+import { cluster2 } from '../../groups/cluster2';
 
 const csvFilePath = 'data/Buchungen.csv';
 const selectedFields = ['Date', 'PayeePayerName', 'EntryText', 'Purpose', 'Category', 'Value'];
+const sortProp = 'PayeePayerName';
+const valueProp = 'Value';
 
 @Component({
   tag: 'app-home',
@@ -14,12 +18,38 @@ const selectedFields = ['Date', 'PayeePayerName', 'EntryText', 'Purpose', 'Categ
 })
 export class AppHome {
   private importCsv = async () => {
-    state.results = null;
-    state.results = await readCSV(csvFilePath);
+    importState.results = null;
+    importState.results = await readCSV(csvFilePath);
   };
   private clusterData = async () => {
-    // state.results = null;
-    // state.results = await readCSV(csvFilePath);
+    const cluster = cluster2(stageState.data, sortProp);
+    // const cluster = cluster2(stageState.data.map(i => i[sortProp]));
+    // console.log(`BF CLUSTER`, cluster.groups(2));
+
+    groupsStore.data = cluster.similarGroups(0.5);
+    console.log(`BF CLUSTERS`, groupsStore.data);
+
+    // Cumulate data
+    const groups = groupsStore.data.map(group => {
+      return group.reduce(
+        (all, item) => {
+          if (!item) {
+            return all;
+          }
+
+          all.name = item[sortProp];
+          if (item[valueProp]) {
+            all.value += item[valueProp];
+          }
+          return all;
+        },
+        {
+          value: 0,
+        },
+      );
+    });
+    console.log(`BF CLUSTER GROUPS`, groups);
+    groupsStore.groups = groups;
   };
 
   render() {
@@ -69,7 +99,29 @@ export class AppHome {
               </table>
             )}
           </sl-tab-panel>
-          <sl-tab-panel name="groups">Hier werden die Gruppen dargestellt.</sl-tab-panel>
+          <sl-tab-panel name="groups">
+            {groupsStore.groups.length === 0 ? (
+              <span>Keine Gruppen vorhanden.</span>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Gruppe</th>
+                    <th>Betrag</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {groupsStore.groups.map(group => (
+                    <tr>
+                      <td>{group.name.substring(0, 63)}</td>
+                      <td>{group.value}</td>
+                    </tr>
+                  ))}
+                  <tr></tr>
+                </tbody>
+              </table>
+            )}
+          </sl-tab-panel>
         </sl-tab-group>
       </div>
     );

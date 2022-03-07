@@ -1,6 +1,4 @@
 import { createStore } from '@stencil/store';
-// import { cluster } from './cluster';
-import { cluster2 } from './cluster2';
 
 import { fill } from './fill';
 import { sort } from './sort';
@@ -22,14 +20,6 @@ onChange('data', data => {
 
   // Sort data
   sort(data, sortProp);
-
-  // Cluster data
-  // cluster(data, sortProp);
-
-  const cluster = cluster2(data.map(i => i[sortProp]));
-  // console.log(`BF CLUSTER`, cluster);
-  // console.log(`BF CLUSTER`, cluster.groups(2));
-  console.log(`BF CLUSTER`, cluster.similarGroups(0.5));
 });
 
 export default state;
