@@ -1,6 +1,7 @@
-interface GroupItem {
+export interface GroupItem {
   name: string;
   value: number;
+  items: any[];
 }
 
 export interface GroupsStore {
