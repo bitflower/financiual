@@ -4,8 +4,8 @@ import { readCSV } from '../../import/import';
 import importState from '../../import/store';
 import stageState from '../../stage/store';
 import groupsStore from '../../groups/store';
-import { GroupItem } from '../../groups/store-interface';
-import { cluster2 } from '../../groups/cluster2';
+
+import { buildGroups, cluster } from './cluster.worker';
 
 const csvFilePath = 'data/Buchungen.csv';
 const selectedFields = ['Date', 'PayeePayerName', 'EntryText', 'Purpose', 'Category', 'Value'];
@@ -25,49 +25,21 @@ export class AppHome {
     importState.results = await readCSV(csvFilePath);
   };
   private ratio = 0.5;
-  private cluster;
-  private clusterData = async () => {
-    this.cluster = cluster2(stageState.data, sortProp);
-    // const cluster = cluster2(stageState.data.map(i => i[sortProp]));
-    // console.log(`BF CLUSTER`, cluster.groups(2));
 
+  private clusterData = async () => {
+    await cluster(stageState.data, sortProp);
     this.buildGroups(this.ratio);
   };
 
-  private buildGroups = (ratio: number) => {
-    groupsStore.data = this.cluster.similarGroups(ratio);
-    console.log(`BF CLUSTERS`, groupsStore.data);
+  private buildGroups = async (ratio: number) => {
+    const { data, groups } = await buildGroups(ratio, sortProp, valueProp);
+    console.log(`BF CLUSTERED`, { data, groups });
 
-    // Cumulate data
-    const groups = groupsStore.data.map(group => {
-      return group.reduce(
-        (all: GroupItem, item) => {
-          if (!item) {
-            return all;
-          }
-
-          all.name = item[sortProp];
-          if (item[valueProp]) {
-            all.value += item[valueProp];
-          }
-
-          all.items.push(item);
-
-          return all;
-        },
-        {
-          value: 0,
-          items: [],
-        } as GroupItem,
-      );
-    });
-
-    console.log(`BF CLUSTER GROUPS`, groups);
+    groupsStore.data = data;
     groupsStore.groups = groups.sort((a, b) => (a[sortProp] > b['name'] ? 1 : a['name'] < b['name'] ? -1 : 0));
   };
 
   private onSliderInput = (e: Event) => {
-    console.log(`BF SLIDER`, { e, val: this.sliderRef.value });
     this.ratio = parseInt(this.sliderRef.value) / 100;
     this.buildGroups(this.ratio);
   };
@@ -125,7 +97,7 @@ export class AppHome {
             ) : (
               <Fragment>
                 <div class="slidecontainer">
-                  <label>Gleichheit: {this.ratio.toFixed(2)}</label>
+                  <label>Ähnlichkeitsfaktor: {this.ratio.toFixed(2)}</label>
                   <input ref={el => (this.sliderRef = el)} type="range" min="1" max="100" value="50" class="slider" id="myRange" onChange={this.onSliderInput} />
                 </div>
                 <table>
