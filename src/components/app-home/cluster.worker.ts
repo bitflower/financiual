@@ -9,10 +9,10 @@ export const cluster = async (data: any[], prop: string) => {
 };
 
 export const buildGroups = async (ratio: number, sortProp: string, valueProp: string) => {
-  const data = myCluster.similarGroups(ratio);
+  const data: any[][] = myCluster.similarGroups(ratio);
 
   // Cumulate data
-  const groups = data.map(group => {
+  const groups: GroupItem[] = data.map(group => {
     return group.reduce(
       (all: GroupItem, item) => {
         if (!item) {
@@ -31,7 +31,7 @@ export const buildGroups = async (ratio: number, sortProp: string, valueProp: st
       {
         value: 0,
         items: [],
-      } as GroupItem,
+      },
     );
   });
 

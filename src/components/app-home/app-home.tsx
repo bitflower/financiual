@@ -1,4 +1,4 @@
-import { Component, Fragment, h } from '@stencil/core';
+import { Component, Fragment, h, State } from '@stencil/core';
 
 import { readCSV } from '../../import/import';
 import importState from '../../import/store';
@@ -20,15 +20,28 @@ const valueProp = 'Value';
 export class AppHome {
   private sliderRef: HTMLInputElement;
 
+  private ratio = 0.5;
+
+  @State()
+  private groupState: 'empty' | 'loading' | 'done' = 'empty';
+
+  // --------------------------------------------------------------------------
+  //
+  //  Private Methods
+  //
+  // --------------------------------------------------------------------------
+
   private importCsv = async () => {
+    this.groupState = 'empty';
     importState.results = null;
     importState.results = await readCSV(csvFilePath);
   };
-  private ratio = 0.5;
 
   private clusterData = async () => {
+    this.groupState = 'loading';
     await cluster(stageState.data, sortProp);
     this.buildGroups(this.ratio);
+    this.groupState = 'done';
   };
 
   private buildGroups = async (ratio: number) => {
@@ -36,7 +49,7 @@ export class AppHome {
     console.log(`BF CLUSTERED`, { data, groups });
 
     groupsStore.data = data;
-    groupsStore.groups = groups.sort((a, b) => (a[sortProp] > b['name'] ? 1 : a['name'] < b['name'] ? -1 : 0));
+    groupsStore.groups = groups.sort((a, b) => (a[sortProp] > b.name ? 1 : a.name < b.name ? -1 : 0));
   };
 
   private onSliderInput = (e: Event) => {
@@ -52,7 +65,6 @@ export class AppHome {
         </stencil-route-link> */}
         <button onClick={this.importCsv}>Importieren</button>
         <button onClick={this.clusterData}>Gruppieren</button>
-        {/* <ul>{stageState.fields.filter(f => selectedFields.includes(f)).map(field => <li>{field}</li>)}</ul> */}
 
         <sl-tab-group>
           <sl-tab slot="nav" panel="import">
@@ -92,49 +104,59 @@ export class AppHome {
             )}
           </sl-tab-panel>
           <sl-tab-panel name="groups">
-            {groupsStore.groups.length === 0 ? (
+            {this.groupState === 'empty' ? (
               <span>Keine Gruppen vorhanden.</span>
+            ) : this.groupState === 'loading' ? (
+              <span>Gruppen werden gebildet. Bitte warten ...</span>
             ) : (
               <Fragment>
                 <div class="slidecontainer">
                   <label>Ähnlichkeitsfaktor: {this.ratio.toFixed(2)}</label>
-                  <input ref={el => (this.sliderRef = el)} type="range" min="1" max="100" value="50" class="slider" id="myRange" onChange={this.onSliderInput} />
+                  <input ref={el => (this.sliderRef = el)} type="range" min="1" max="100" value="50" class="slider" id="myRange" onInput={this.onSliderInput} />
                 </div>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Gruppe</th>
-                      <th>Betrag</th>
-                      <th>Einträge</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {groupsStore.groups.map(group => (
-                      <tr>
-                        <td>
-                          <span>{group.name.substring(0, 63)}</span>
-                        </td>
-                        <td>{group.value}</td>
-                        <td>
-                          <sl-tooltip>
-                            <div slot="content">
-                              <p>
-                                In dieser Gruppe befinden sich <strong>{group.items.length}</strong> Einträge
-                              </p>
-                              <ul>
-                                {group.items.map(item => (
-                                  <li>{item[sortProp]}</li>
-                                ))}
-                              </ul>
-                            </div>
-                            <span>{group.items.length}</span>
-                          </sl-tooltip>
-                        </td>
-                      </tr>
-                    ))}
-                    <tr></tr>
-                  </tbody>
-                </table>
+                <sl-split-panel>
+                  <div slot="start">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Gruppe</th>
+                          <th>Betrag</th>
+                          <th>Einträge</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {groupsStore.groups.map(group => (
+                          <tr>
+                            <td>
+                              <span>{group.name.substring(0, 63)}</span>{' '}
+                              <sl-tag size="small" pill variant="primary">
+                                {group.items.length}
+                              </sl-tag>
+                            </td>
+                            <td>{group.value}</td>
+                            <td>
+                              <sl-tooltip>
+                                <div slot="content">
+                                  <p>
+                                    In dieser Gruppe befinden sich <strong>{group.items.length}</strong> Einträge
+                                  </p>
+                                  <ul>
+                                    {group.items.map(item => (
+                                      <li>{item[sortProp]}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                                <span>{group.items.length}</span>
+                              </sl-tooltip>
+                            </td>
+                          </tr>
+                        ))}
+                        <tr></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div slot="end">End</div>
+                </sl-split-panel>
               </Fragment>
             )}
           </sl-tab-panel>
